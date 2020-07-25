@@ -1,6 +1,8 @@
 # CRPD Topology Builder
+cRPD is Juniper Networks containerized routing stack. It can run on top of Linux distros to program kernel routing tables. This
+project allows to bring up random cRPD topologies to help build networks and test cRPD related features. This script relies on 
+docker APIs and the links created between containers would be a veth interface.
 
-This script allows one to build cRPD topologies using docker. The links created between containers would be a veth interface.
 The definition of the topology is an input from a yaml file and we can also pass initial configuration to all cRPD containers.
 The configuration is a file input with set commands present with each in a new line. 
 
