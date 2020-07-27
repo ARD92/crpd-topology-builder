@@ -14,11 +14,7 @@ Note: Ensure the directory /var/run/netns exists. if not do the below
       mkdir -p /var/run/netns
       
       This works only on linux systems and not on mac and windows. Uses veth to create
-#ifndef VERSION1
       interfaces between containers. If using this standard ubuntu/alpine containers 
-#else /* VERSION1 */
-          interfaces between containers. If using this standard ubuntu/alpine containers 
-#endif /* VERSION1 */
       ensure that the distro can use "ip addr" commands.
 
 To Do:
