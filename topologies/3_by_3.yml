@@ -8,7 +8,12 @@
 #           prefix: 192.168.50.1/30
 #         - name: spine2
 #           prefix: 192.168.50.5/30
-
+#       volume:
+#         - name: config
+#           path: /config
+#         - name: varlog
+#           path: /var/log
+#
 #
 #
 #   +---------------+                        +-----------------+
@@ -44,6 +49,11 @@ nodes:
         prefix: 192.168.50.1/30
       - name: spine2
         prefix: 192.168.50.5/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlog
+          path: /var/log
 
   - name: leaf2
     image: crpd-rift:latest
@@ -52,6 +62,11 @@ nodes:
         prefix: 192.168.60.1/30
       - name: spine2
         prefix: 192.168.60.5/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlog
+          path: /var/log
 
   - name: spine1
     image: crpd-rift:latest
@@ -64,6 +79,11 @@ nodes:
         prefix: 192.168.70.1/30
       - name: tof2
         prefix: 192.168.80.1/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlog
+          path: /var/log
 
   - name: spine2
     image: crpd-rift:latest
@@ -76,6 +96,11 @@ nodes:
         prefix: 192.168.70.5/30
       - name: tof2
         prefix: 192.168.80.5/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlog
+          path: /var/log
 
   - name: tof1
     image: crpd-rift:latest
@@ -84,6 +109,11 @@ nodes:
         prefix: 192.168.70.2/30
       - name: spine2
         prefix: 192.168.70.6/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlog
+          path: /var/log
 
   - name: tof2
     image: crpd-rift:latest
@@ -92,3 +122,8 @@ nodes:
         prefix: 192.168.80.2/30
       - name: spine2
         prefix: 192.168.80.6/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlog
+          path: /var/log

@@ -34,19 +34,28 @@
    
 nodes:
   - name: ce1
-    image: crpd:20.1R1.9
+    image: crpd:20.1R1.11
     link:
       - name: pe1
         prefix: 192.168.1.9/30
-
+    volume:
+        - name: config
+          path: /config
+        - name: varlog
+          path: /var/log
   - name: ce2
-    image: crpd:20.1R1.9
+    image: crpd:20.1R1.11
     link:
       - name: pe1
         prefix: 192.168.1.14/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlog
+          path: /var/log
 
   - name: pe1
-    image: crpd:20.1R1.9
+    image: crpd:20.1R1.11
     link:
       - name: ce1
         prefix: 192.168.1.10/30
@@ -54,17 +63,27 @@ nodes:
         prefix: 192.168.1.13/30
       - name: p1
         prefix: 192.168.1.1/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlog
+          path: /var/log
 
   - name: p1
-    image: crpd:20.1R1.9
+    image: crpd:20.1R1.11
     link:
       - name: pe1
         prefix: 192.168.1.2/30
       - name: pe2
         prefix: 192.168.1.5/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlog
+          path: /var/log
 
   - name: pe2
-    image: crpd:20.1R1.9
+    image: crpd:20.1R1.11
     link:
       - name: ce3
         prefix: 192.168.1.17/30
@@ -72,15 +91,30 @@ nodes:
         prefix: 192.168.1.21/30
       - name: p1
         prefix: 192.168.1.6/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlog
+          path: /var/log
 
   - name: ce3
-    image: crpd:20.1R1.9
+    image: crpd:20.1R1.11
     link:
       - name: pe2
         prefix: 192.168.1.18/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlog
+          path: /var/log
 
   - name: ce4
-    image: crpd:20.1R1.9
+    image: crpd:20.1R1.11
     link:
       - name: pe2
         prefix: 192.168.1.22/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlog
+          path: /var/log
