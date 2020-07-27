@@ -56,13 +56,18 @@ nodes:
         prefix: 192.168.50.5/30
       - name: spine3
         prefix: 192.168.50.9/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlog
+          path: /var/log
 ```
 - name: Defines the name of the container
 - image: image to use to spin up the container. This script assumes that the image is already present and loaded. 
        Verify if the image is present using "docker images"
 - link: defines the link to be created between the nodes . In the above mentioned template links will be created 
       between tof1 and spine1 , tof1 and spine2, tof1 and spine3 with the respective prefixes mentioned.  
-
+- volume: defines the volumes to be mounted on each container. In the above mentioned template volumes for configuration and logs are mounted to the provided paths. Configurations can be pre-provisioned by coping them to the config volume before starting the container.
 The interface name would be as tof1_spine1, tof1_spine2 and tof1_spine3.
 
 ## Configuration template
@@ -92,7 +97,7 @@ set protocols rift apply-groups rift-defaults
 2. Ensure a configuration file is created (Optional) 
 3. Create virtual env using "virtualenv -p /usr/bin/python3 crpd-env"
 4. Activate venv "source crpd-env/bin/active"
-5. Install dependencies using "pip install requirements.txt"
+5. Install dependencies using "pip install -r requirements.txt"
 
 ### To create the topology 
 ```

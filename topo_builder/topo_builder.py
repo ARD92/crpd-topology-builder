@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 __author__ = "Aravind"
+__email__ = "aprabh@juniper.net"
 
 import sys
 import os 
@@ -13,7 +14,11 @@ Note: Ensure the directory /var/run/netns exists. if not do the below
       mkdir -p /var/run/netns
       
       This works only on linux systems and not on mac and windows. Uses veth to create
+#ifndef VERSION1
       interfaces between containers. If using this standard ubuntu/alpine containers 
+#else /* VERSION1 */
+          interfaces between containers. If using this standard ubuntu/alpine containers 
+#endif /* VERSION1 */
       ensure that the distro can use "ip addr" commands.
 
 To Do:
@@ -27,6 +32,7 @@ parser.add_argument("-t", action='store', dest='topology', help='topology yaml f
 parser.add_argument("-a", action='store', dest='action', help='create/delete topology')
 parser.add_argument("-cfg", action='store', dest='config', help='config file to configure containers')
 parser.add_argument("-c", action='store', dest='container', help='container to which config has to be passed.')
+parser.add_argument("-f", action='store_true', dest='force', default=False, help='remove volumes when deleting the topology.')
 args = parser.parse_args()
 
 # Initiate logger
@@ -38,10 +44,12 @@ def banner():
     print('|           container topology builder                                  |')
     print('+-----------------------------------------------------------------------+')
     print('| Usage: ./topo_builder.py -a create/delete/config/backup -t <yml file> |')
-    print('|                                                                       |')
     print('|  In case you want to pass common initial configuration                |')
     print('|  to all containers then. issue the below command to all               |')
-    print('|                                                                       |') 
+    print('|                                                                       |')
+    print('|  In case you want to delete the created volumes pass -f flag.         |')
+    print('|  Only applicable when issuing the delete action.                      |')
+    print('|                                                                       |')
     print('|./topo_builder.py -a config -t <yml file> -cfg <config.txt>            |')
     print('|                                                                       |')
     print('| In case you want to configure different containers with               |')
@@ -49,8 +57,8 @@ def banner():
     print('|                                                                       |')
     print('| ./topo_builder.py -a config -c <container name> -cfg <file>           |')
     print('|                                                                       |')
-    print('| ./topo_builder.py -a backup -c <container name> to backup single      |')
-    print('| ./topo_builder.py -a backup -t <yml file> to backup all               |')             
+    print('| ./topo_builder.py -a backup -c <container name>   to backup single    |')
+    print('| ./topo_builder.py -a backup -t <yml file> to backup all               |')
     print('|    For general help: ./topo_builder.py --help                         |')
     print('|  Log file would be generated in cwd as topo_creator.log               |')
     print('+-----------------------------------------------------------------------+')
@@ -74,26 +82,53 @@ image: --> {'spine1': 'crpd-rift:latest',
             'leaf1': 'crpd-rift:latest',
             'leaf2': 'crpd-rift:latest'}
 """ 
+#ifdef VERSION1
+#TO-DO: review if it can be optimized with comprehensions
+#endif /* VERSION1 */
 def parse(mapp):
     links = {}
     images = {}
+    volumes = {}
     for node in mapp["nodes"]:
-        images[node["name"]] = node["image"]
+        nodeName = node["name"]
+        images[nodeName] = node["image"]
+        volumes[nodeName] = {}
         for intf in node["link"]:
-            links[node["name"]+"_"+intf["name"]] = intf["prefix"]
-    return links, images
+            links[nodeName+"_"+intf["name"]] = intf["prefix"]
+        for vol in node["volume"]:
+            volumes[nodeName][nodeName+"_"+vol["name"]] = { "bind": vol["path"], "mode": "rw" }
+    return links, images, volumes
 
+# Create/delete volumes for containers
+def handleVolume(client, name, action):
+    if action == 'create':
+        try:
+            if (client.volumes.get(name)):
+                logging.debug("volume exists. Will be reutilised")
+                return name
+        except docker.errors.NotFound as err:
+            logging.info("Volume {} does not exist. Will be created".format(name))
+            client.volumes.create(name=name)
+            return name
+        except docker.errors.APIError as err:
+            print("API server error",err)
 
-# Start/Stop containers for the topology
-def handleContainer(client, name, image, action):
+    if action == 'delete':
+        try:
+            client.volumes.get(name).remove()
+            logging.info("Volume {} deleted".format(name))
+        except docker.errors.APIError as err:
+            print("API server error",err)
+
+def handleContainer(client, name, image, volumes, action):
         if action =='create':
             if (client.images.get(image)):  
                 logging.debug("image present, starting container")
-                client.containers.run(image=image, name=name, hostname=name, network_mode='bridge', 
-                                        privileged=True, detach=True)
+                logging.debug("attaching volumes: %s", volumes)
+                client.containers.run(image=image, name=name, hostname=name, network_mode='bridge',
+                                        volumes=volumes, privileged=True, detach=True)
             else:
                 logging.error("Faled: Image not present. Please load the image first using docker load -i <image>")
-
         if action == 'delete':
             _id = client.containers.get(name)
             logging.info("stopping container {}".format(_id))
@@ -113,7 +148,6 @@ def createVeth(name, peername):
         return 1
     except:
         return "Error creating Veth pair"
-
 
 # Delete veth. Currently not used [WIP]
 '''
@@ -181,7 +215,6 @@ def configureJunos(client, container, config):
                 logging.debug(commit_out)
             except:
                 logging.error("Commit failed: check the commands in config file")
-
                 
 # Backup configuration
 def backupConfig(client, container):
@@ -195,7 +228,6 @@ def backupConfig(client, container):
             fout.close()
         print("backup of container {} completed ".format(container))
         logging.info("backup of container {} completed ".format(container))
-
     
 def main():
     banner()
@@ -203,85 +235,87 @@ def main():
     global client_lowlevel
     client = docker.from_env()
     client_lowlevel = docker.APIClient(base_url='unix://var/run/docker.sock')
-    # action create topology
-    if args.action == 'create':
+    if args.action:
         # Load yaml file
         yaml_open = open(args.topology)
         mapp = yaml.load(yaml_open, Loader=yaml.FullLoader)
         # Parse the yaml
-        links,images = parse(mapp)
-        print(" ********** Creating topology ************* ")
-        for container in images:
-            handleContainer(client, container, images[container], args.action)
-            logging.info("{} container {}".format(args.action, container))
-
-        logging.debug(50*"*")
-        logging.debug("Images: \n")
-        logging.debug(images)
-        logging.debug(50*"*")
-        logging.debug("links: \n")
-        logging.debug(links)
-        logging.debug(50*"*")
-
-            
-        # create links
-        del_list = [] 
-        for link in links:
-            if link not in del_list:
-                name = link
-                ip = links[link]
-                temp = name.split("_")
-                container = temp[0]
-                peer_container = temp[1]
-                temp = temp[::-1]
-                peer_name = '_'.join(temp)
-                if peer_name in links:
-                    peer_ip = links[peer_name]
-                    createVeth(name, peer_name)
-                    cid = findPid(client, container)
-                    connect(client, name, container, cid, ip)
-                    pcid = findPid(client, peer_container)
-                    connect(client, peer_name, peer_container, pcid, peer_ip)
-                    del_list.append(peer_name)
-                    del_list.append(name)
-
-
-    # action delete topology
-    if args.action == 'delete':
-        # Load yaml file
-        yaml_open = open(args.topology)
-        mapp = yaml.load(yaml_open, Loader=yaml.FullLoader)
-        # Parse the yaml
-        links,images = parse(mapp)
-        print(" ****** Deleting topology ******** ")
-        for container in images:
-            handleContainer(client, container, images[container], args.action)
-            logging.info("{} container {}".format(args.action, container))
-
-
-    # Initial configuration.Only applicable to cRPD
-    if args.action == 'config':
-        if args.container:
-            print(" **** Configuring container {} ".format(args.container))
-            configureJunos(client, args.container, args.config)
-        else:
-            print (" *********** Sending initial config to cRPD ************ ") 
-            yaml_open = open(args.topology)
-            mapp = yaml.load(yaml_open, Loader=yaml.FullLoader)
-            links,images = parse(mapp)
+        links,images,volumes = parse(mapp)
+        # action create topology
+        if args.action == 'create':
+            print(" ********** Creating topology ************* ")
             for container in images:
-                configureJunos(client, container, args.config)      
+                for volume in volumes[container]:
+                    handleVolume(client, volume, args.action)
+                handleContainer(client, container, images[container], volumes[container], args.action)
+                logging.info("{} container {}".format(args.action, container))
 
+            logging.debug(50*"*")
+            logging.debug("Images: \n")
+            logging.debug(images)
+            logging.debug(50*"*")
+            logging.debug("links: \n")
+            logging.debug(links)
+            logging.debug(50*"*")
+            logging.debug("Volumes: \n")
+            logging.debug(volumes)
+            logging.debug(50*"*")
+                
+            # create links
+            del_list = [] 
+            for link in links:
+                if link not in del_list:
+                    name = link
+                    ip = links[link]
+                    temp = name.split("_")
+                    container = temp[0]
+                    peer_container = temp[1]
+                    temp = temp[::-1]
+                    peer_name = '_'.join(temp)
+                    if peer_name in links:
+                        peer_ip = links[peer_name]
+                        createVeth(name, peer_name)
+                        cid = findPid(client, container)
+                        connect(client, name, container, cid, ip)
+                        pcid = findPid(client, peer_container)
+                        connect(client, peer_name, peer_container, pcid, peer_ip)
+                        del_list.append(peer_name)
+                        del_list.append(name)
 
-    if args.action == 'backup':
-        if args.container:
-            backupConfig(client, args.container)
-        else:
-            yaml_open = open(args.topology)
-            mapp = yaml.load(yaml_open, Loader=yaml.FullLoader)
-            links,images = parse(mapp)
+        # action delete topology
+        if args.action == 'delete':
+            print(" ****** Deleting topology ******** ")
             for container in images:
-                backupConfig(client, container)
+                handleContainer(client, container, images[container], None, args.action)
+                logging.info("{} container {}".format(args.action, container))
+                if args.force == True:
+                    for volume in volumes[container]:
+                        handleVolume(client, volume, args.action)
+                        logging.info("{} volume {}".format(args.action, volume))
+
+        # Initial configuration.Only applicable to cRPD
+        if args.action == 'config':
+            if args.container:
+                print(" **** Configuring container {} ".format(args.container))
+                configureJunos(client, args.container, args.config)
+            else:
+                print (" *********** Sending initial config to cRPD ************ ") 
+                yaml_open = open(args.topology)
+                mapp = yaml.load(yaml_open, Loader=yaml.FullLoader)
+                links,images = parse(mapp)
+                for container in images:
+                    configureJunos(client, container, args.config)      
+
+        if args.action == 'backup':
+            if args.container:
+                backupConfig(client, args.container)
+            else:
+                yaml_open = open(args.topology)
+                mapp = yaml.load(yaml_open, Loader=yaml.FullLoader)
+                links,images = parse(mapp)
+                for container in images:
+                    backupConfig(client, container)
+#endif /* VERSION1 */
 
 # Main function
 if __name__=="__main__":
