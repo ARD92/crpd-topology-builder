@@ -298,7 +298,7 @@ def main():
                 print (" *********** Sending initial config to cRPD ************ ") 
                 yaml_open = open(args.topology)
                 mapp = yaml.load(yaml_open, Loader=yaml.FullLoader)
-                links,images = parse(mapp)
+                links,images,volumes = parse(mapp)
                 for container in images:
                     configureJunos(client, container, args.config)      
 
@@ -308,7 +308,7 @@ def main():
             else:
                 yaml_open = open(args.topology)
                 mapp = yaml.load(yaml_open, Loader=yaml.FullLoader)
-                links,images = parse(mapp)
+                links,images,volumes = parse(mapp)
                 for container in images:
                     backupConfig(client, container)
 #endif /* VERSION1 */
