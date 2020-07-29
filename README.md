@@ -4,7 +4,9 @@ project allows to bring up random cRPD topologies to help build networks and tes
 docker APIs and the links created between containers would be a veth interface.
 
 The definition of the topology is an input from a yaml file and we can also pass initial configuration to all cRPD containers.
-The configuration is a file input with set commands present with each in a new line. 
+The configuration can be passed into the container in 2 ways. we can either use a file input with set commands present with each in a new line,
+or directly prebuild the configuration file and paste it in the config directory which would have been mounted as a volume before starting
+the container.  
 
 we can also use this for other containers in order to bring them up, but in order to connect, we make the container a named
 network namespace (docker usually keeps them unnamed) and use ip link commands to move the interfaces into the respective
@@ -40,6 +42,8 @@ docker==4.2.0
 root@vNTC-4:/home/csim/aravind/20.3/vmx# docker --version
 Docker version 18.09.7, build 2d0083d
 ```
+This version does not support addition of IPv6 addresses yet. When an interface is brought up, it automatically comes up with only 
+the link local address. Passing IPV6 addresses for links in the yaml file would not work.
 
 ## Topology template definition 
 The template is a YAML file definition where we mention the container name, image and link to which container. Below is the template
@@ -71,10 +75,27 @@ nodes:
 The interface name would be as tof1_spine1, tof1_spine2 and tof1_spine3.
 
 ## Configuration template
-The configuration template should be a file with all Junos configuration in set format. This configuration would 
-be passed into all the cRPD containers and get committed. Ensure that the configuration is valid else Junos may 
-reject the configuration. 
+There are two methods in which you can have the configuration sent to all the containers. 
 
+1. Configuration file containing the set commands 
+    * The configuration template should be a file with all Junos configuration in set format. This configuration would 
+      be passed into all the cRPD containers and get committed. Ensure that the configuration is valid else Junos may 
+      reject the configuration. The action arg "-a" should be "config"
+    * You can pass the config file with arg -cfg to have the common config across all
+      containers
+    * Optionally you can pass the arg -c to pass the config  to pass the configuration to a specific container.
+    * Check the example section below.
+
+2. Prebuild the configuration and paste it in the respective config volume mounted.
+    * You can prebuild the configuration and store it as junos.conf.gz in the volume mounted.
+    * Find the volume mount path for respective container using "docker volume ls" and inspect using "docker volume inspect <name>"
+    * move the junos.conf.gz into the volume directory
+    * start the container "docker exec -it <container> cli" and observe that config is pre-loaded.
+ 
+3. Backup configuration 
+    * You can backup the configuration from a container using action "backup" to backup config from all containers
+    * Optionally backup from specific container using argument -c <name of container>
+    * The backup would be stored as backup_<name of container>.txt and the config would be in set format. 
 ```
 topology_builder % more config_rift_common.txt
 
@@ -174,7 +195,7 @@ Below topology has been brought up using the script
 ```
 
 ### Topology tempalte
-The file has been saved as 2x3x4.yml
+The file has been saved as 2x3x4.yml under the directory topologies
 ``` 
 nodes:
   - name: tof1
@@ -186,7 +207,11 @@ nodes:
         prefix: 192.168.50.5/30
       - name: spine3
         prefix: 192.168.50.9/30
-
+    volume:
+        - name: config
+          path: /config
+        - name: varlog
+          path: /var/log
 
   - name: tof2
     image: crpd-rift:latest
@@ -197,6 +222,11 @@ nodes:
         prefix: 192.168.51.5/30
       - name: spine3
         prefix: 192.168.51.9/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlog
+          path: /var/log
 
   - name: spine1
     image: crpd-rift:latest
@@ -213,78 +243,15 @@ nodes:
         prefix: 192.168.60.9/30
       - name: leaf4
         prefix: 192.168.60.13/30
-
-  - name: spine2
-    image: crpd-rift:latest
-    link:
-      - name: tof1
-        prefix: 192.168.50.6/30
-      - name: tof2
-        prefix: 192.168.51.6/30
-      - name: leaf1
-        prefix: 192.168.61.1/30
-      - name: leaf2
-        prefix: 192.168.61.5/30
-      - name: leaf3
-        prefix: 192.168.61.9/30
-      - name: leaf4
-        prefix: 192.168.61.13/30
-
-  - name: spine3
-    image: crpd-rift:latest
-    link:
-      - name: tof1
-        prefix: 192.168.50.10/30
-      - name: tof2
-        prefix: 192.168.51.10/30
-      - name: leaf1
-        prefix: 192.168.62.1/30
-      - name: leaf2
-        prefix: 192.168.62.5/30
-      - name: leaf3
-        prefix: 192.168.62.9/30
-      - name: leaf4
-        prefix: 192.168.62.13/30
-
-  - name: leaf1
-    image: crpd-rift:latest
-    link:
-      - name: spine1
-        prefix: 192.168.60.2/30
-      - name: spine2
-        prefix: 192.168.61.2/30
-      - name: spine3
-        prefix: 192.168.62.2/30
-
-  - name: leaf2
-    image: crpd-rift:latest
-    link:
-      - name: spine1
-        prefix: 192.168.60.6/30
-      - name: spine2
-        prefix: 192.168.61.6/30
-      - name: spine3
-        prefix: 192.168.62.6/30
-
-  - name: leaf3
-    image: crpd-rift:latest
-    link:
-      - name: spine1
-        prefix: 192.168.60.10/30
-      - name: spine2
-        prefix: 192.168.61.10/30
-      - name: spine3
-        prefix: 192.168.62.10/30
-
-  - name: leaf4
-    image: crpd-rift:latest
-    link:
-      - name: spine1
-        prefix: 192.168.60.14/30
-      - name: spine2
-        prefix: 192.168.61.14/30
-      - name: spine3
-        prefix: 192.168.62.14/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlog
+          path: /var/log
+...
+...
+...
+...
 ```
 
 ### Usage 
