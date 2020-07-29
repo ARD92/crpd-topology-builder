@@ -121,8 +121,10 @@ def handleContainer(client, name, image, volumes, action):
             if (client.images.get(image)):  
                 logging.debug("image present, starting container")
                 logging.debug("attaching volumes: %s", volumes)
-                client.containers.run(image=image, name=name, hostname=name, network_mode='none',
-                                        volumes=volumes, privileged=True, detach=True)
+                client.containers.run(image=image, name=name, hostname=name, network_mode='bridge',
+                                        volumes=volumes, privileged=True, detach=True,
+                                        ports={'830/tcp':None,'40051/tcp':None,'22/tcp':None}
+                                        )
             else:
                 logging.error("Faled: Image not present. Please load the image first using docker load -i <image>")
         if action == 'delete':
