@@ -85,12 +85,19 @@ def parse(mapp):
     links = {}
     images = {}
     volumes = {}
+    dup_intf = []
     for node in mapp["nodes"]:
         nodeName = node["name"]
         images[nodeName] = node["image"]
         volumes[nodeName] = {}
         for intf in node["link"]:
-            links[nodeName+"_"+intf["name"]] = intf["prefix"]
+            if intf["name"] in dup_intf:
+                links[nodeName+"_"+intf["name"]+"_"+str(dup_intf.count(intf["name"]))] = intf["prefix"]
+                dup_intf.append(intf["name"])
+            else:
+                links[nodeName+"_"+intf["name"]] = intf["prefix"]
+                dup_intf.append(intf["name"])
+        dup_intf=[]
         for vol in node["volume"]:
             volumes[nodeName][nodeName+"_"+vol["name"]] = { "bind": vol["path"], "mode": "rw" }
     return links, images, volumes
@@ -268,8 +275,15 @@ def main():
                     temp = name.split("_")
                     container = temp[0]
                     peer_container = temp[1]
-                    temp = temp[::-1]
-                    peer_name = '_'.join(temp)
+                    if len(temp) == 3:
+                        # swap only first 2 elements in list and retain the index # for intf
+                        temp_peer_name = temp[:2]
+                        temp_peer_name = temp_peer_name[::-1]
+                        temp_peer_name.append(temp[2])
+                        peer_name = '_'.join(temp_peer_name)
+                    else:
+                        temp = temp[::-1]
+                        peer_name = '_'.join(temp)
                     if peer_name in links:
                         peer_ip = links[peer_name]
                         createVeth(name, peer_name)
