@@ -25,7 +25,7 @@ To Do:
 # Argument parser
 parser = argparse.ArgumentParser()
 parser.add_argument("-t", action='store', dest='topology', help='topology yaml file')
-parser.add_argument("-a", action='store', dest='action', help='create/delete topology')
+parser.add_argument("-a", action='store', dest='action', help='create/delete/config/backup topology')
 parser.add_argument("-cfg", action='store', dest='config', help='config file to configure containers')
 parser.add_argument("-c", action='store', dest='container', help='container to which config has to be passed.')
 parser.add_argument("-f", action='store_true', dest='force', default=False, help='remove volumes when deleting the topology.')

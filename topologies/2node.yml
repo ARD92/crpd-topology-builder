@@ -1,8 +1,8 @@
 nodes:
-  - name: ce1
+  - name: node1
     image: crpd:20.3I20200805_1733_nvinay
     link:
-      - name: ce2
+      - name: node2
         prefix: 192.168.1.1/30
         #- name: ce2
         #prefix: 192.168.2.1/30
@@ -12,10 +12,10 @@ nodes:
         - name: varlogq
           path: /var/log
 
-  - name: ce2
+  - name: node2
     image: crpd:20.3I20200805_1733_nvinay
     link:
-      - name: ce1
+      - name: node1
         prefix: 192.168.1.2/30
         #- name: ce1
         #prefix: 192.168.2.2/30

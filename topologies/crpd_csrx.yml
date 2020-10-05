@@ -38,8 +38,10 @@ nodes:
         prefix: 192.168.1.1/30
       - name: csrx
         prefix: 192.168.2.1/30
-      - name: crpd1
-        prefix: 192.168.5.2/30
+      - name: csrx
+        prefix: 192.168.3.1/30
+      - name: csrx
+        prefix: 192.168.4.1/30
     volume:
       - name: config
         path: /config
@@ -53,6 +55,10 @@ nodes:
         prefix: 192.168.1.2/30
       - name: crpd2
         prefix: 192.168.2.2/30
+      - name: crpd2
+        prefix: 192.168.3.2/30
+      - name: crpd2
+        prefix: 192.168.4.2/30
     volume:
       - name: config
         path: /config
