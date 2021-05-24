@@ -242,8 +242,8 @@ def main():
     client_lowlevel = docker.APIClient(base_url='unix://var/run/docker.sock')
     if args.action:
         # Load yaml file
-        yaml_open = open(args.topology)
-        mapp = yaml.load(yaml_open, Loader=yaml.FullLoader)
+        with open(args.topology, "r") as f:
+            mapp = yaml.safe_load(f)
         # Parse the yaml
         links,images,volumes = parse(mapp)
         # action create topology
