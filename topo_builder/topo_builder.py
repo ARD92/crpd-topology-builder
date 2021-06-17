@@ -322,8 +322,8 @@ def main():
             if args.container:
                 backupConfig(client, args.container)
             else:
-                yaml_open = open(args.topology)
-                mapp = yaml.load(yaml_open, Loader=yaml.FullLoader)
+                with open(args.topology, "r") as f:
+                    mapp = yaml.safe_load(f)
                 links,images,volumes = parse(mapp)
                 for container in images:
                     backupConfig(client, container)
