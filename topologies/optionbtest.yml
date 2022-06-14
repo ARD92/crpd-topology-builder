@@ -1,0 +1,138 @@
+#        
+#        
+#        
+#        
+#                                                                                                      +---------------+   obce41
+#  obce11  +-----------+                   +------------+      192.168.2.1---------------+ .3.1        |               |   
+#          |           | 192.168.1.1       |            +----------------+               |-------------+   ob4         |   obce42
+#  obce12  |  ob 1     +-------------------+     ob2    | 192.168.2.2    |      ob3      |        .3.2 |               |
+#          +-----------+        192.168.1.2+------------+                +---------------+             +---------------+   obce43
+#  obce13      
+#        
+#
+nodes:
+  - name: ob1
+    image: crpd:latest
+    link:
+      - name: ob2
+        prefix: 192.168.1.1/30
+      - name: obce11
+        prefix: 100.1.1.1/30
+      - name: obce12
+        prefix: 100.1.2.1/30
+      - name: obce13
+        prefix: 100.1.3.1/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+
+  - name: obce11
+    image: crpd:latest
+    link:
+      - name: ob1
+        prefix: 100.1.1.2/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+      
+  - name: obce12
+    image: crpd:latest
+    link:
+      - name: ob1
+        prefix: 100.1.2.2/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+
+  - name: obce13
+    image: crpd:latest
+    link:
+      - name: ob1
+        prefix: 100.1.3.2/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+
+  - name: ob2
+    image: crpd:latest
+    link:
+      - name: ob1
+        prefix: 192.168.1.2/30
+      - name: ob3
+        prefix: 192.168.2.2/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+
+  - name: ob3
+    image: crpd:latest
+    link:
+      - name: ob2
+        prefix: 192.168.2.1/30
+      - name: ob4
+        prefix: 192.168.3.1/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+
+  - name: ob4
+    image: crpd:latest
+    link:
+      - name: ob3
+        prefix: 192.168.3.2/30
+      - name: obce41
+        prefix: 100.4.1.1/30
+      - name: obce42
+        prefix: 100.4.2.1/30
+      - name: obce43
+        prefix: 100.4.3.1/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+
+  - name: obce41
+    image: crpd:latest
+    link:
+      - name: ob4
+        prefix: 100.4.1.2/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+      
+  - name: obce42
+    image: crpd:latest
+    link:
+      - name: ob4
+        prefix: 100.4.2.2/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+
+  - name: obce43
+    image: crpd:latest
+    link:
+      - name: ob4
+        prefix: 100.4.3.2/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log

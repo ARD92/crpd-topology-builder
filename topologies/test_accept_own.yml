@@ -1,0 +1,105 @@
+#                       +------+
+#                       |      |
+#                       |  ce1 +-----+      +--------+          +--------+          +--------+           +-------+
+#                       +------+     |      |        |          |        |          |        +-----------+  csrx1|
+#                                    +----->| node1  +----------+ node2  +----------+  node3 +-----------+-------+
+#                                           |        |          |        |          |        |
+#                       +------+      +---->+--------+          +--------+          +-------++-----------+-------+
+#                       |      |      |                                                     |            | csrx2 |
+#                       |  ce2 +------+                                                     +------------+-------+
+#                       +------+
+#
+nodes:
+  - name: node1
+    image: crpd:latest
+    link:
+      - name: node2
+        prefix: 192.168.1.1/30
+      - name: ce1
+        prefix: 172.168.2.1/30
+      - name: ce2
+        prefix: 172.168.3.1/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: ce1
+    image: crpd:latest
+    link:
+      - name: node1
+        prefix: 172.168.2.2/30
+    volume:
+      - name: config
+        path: /config
+      - name: varlog
+        path: /var/log
+            
+  - name: ce2
+    image: crpd:latest
+    link:
+      - name: node1
+        prefix: 172.168.3.2/30
+    volume:
+      - name: config
+        path: /config
+      - name: varlog
+        path: /var/log
+
+  - name: node2
+    image: crpd:latest
+    link:
+      - name: node1
+        prefix: 192.168.1.2/30
+      - name: node3
+        prefix: 192.168.2.2/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+
+  - name: node3
+    image: crpd:latest
+    link:
+      - name: node2
+        prefix: 192.168.2.1/30
+      - name: csrx1
+        prefix: 192.168.3.1/30
+      - name: csrx1
+        prefix: 192.168.3.5/30
+      - name: csrx2
+        prefix: 192.168.4.1/30
+      - name: csrx2
+        prefix: 192.168.4.5/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+
+  - name: csrx1
+    image: crpd:latest
+    link:
+      - name: node3
+        prefix: 192.168.3.2/30
+      - name: node3
+        prefix: 192.168.3.6/30
+    volume:
+      - name: config
+        path: /config
+      - name: varlog
+        path: /var/log
+
+  - name: csrx2
+    image: crpd:latest
+    link:
+      - name: node3
+        prefix: 192.168.4.2/30
+      - name: node3
+        prefix: 192.168.4.6/30
+    volume:
+      - name: config
+        path: /config
+      - name: varlog
+        path: /var/log
