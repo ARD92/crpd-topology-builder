@@ -1,0 +1,32 @@
+set version "20220521.010553__cd-builder.r1259986 [_cd-builder]"
+set system host-name md04emd
+set routing-options bmp station sc-discovery connection-mode active
+set routing-options bmp station sc-discovery monitor enable
+set routing-options bmp station sc-discovery station-address 10.85.47.166
+set routing-options bmp station sc-discovery station-port 31002
+set routing-options bmp station sc-discovery traceoptions file bmp.log
+set routing-options bmp station sc-discovery traceoptions flag all
+set protocols bgp group SC3_T type external
+set protocols bgp group SC3_T local-address 192.168.2.1
+set protocols bgp group SC3_T family inet unicast
+set protocols bgp group SC3_T peer-as 65200
+set protocols bgp group SC3_T local-as 65001
+set protocols bgp group SC3_T neighbor 192.168.2.2
+set protocols bgp group SC3_UT type external
+set protocols bgp group SC3_UT local-address 192.168.2.5
+set protocols bgp group SC3_UT family inet unicast
+set protocols bgp group SC3_UT peer-as 65201
+set protocols bgp group SC3_UT local-as 65001
+set protocols bgp group SC3_UT neighbor 192.168.2.6
+set protocols bgp group SC4_T type external
+set protocols bgp group SC4_T local-address 192.168.2.9
+set protocols bgp group SC4_T family inet unicast
+set protocols bgp group SC4_T peer-as 65210
+set protocols bgp group SC4_T local-as 65001
+set protocols bgp group SC4_T neighbor 192.168.2.10
+set protocols bgp group SC4_UT type external
+set protocols bgp group SC4_UT local-address 192.168.2.13
+set protocols bgp group SC4_UT family inet unicast
+set protocols bgp group SC4_UT peer-as 65211
+set protocols bgp group SC4_UT local-as 65001
+set protocols bgp group SC4_UT neighbor 192.168.2.14

@@ -229,7 +229,7 @@ def backupConfig(client, container):
         print(_id)
         text = _id.exec_run(cmd='cli -c "show configuration | display set"').output
         with open('backup_{}.txt'.format(container),'w') as fout:
-            fout.writelines(text)
+            fout.writelines(text.decode())
             fout.close()
         print("backup of container {} completed ".format(container))
         logging.info("backup of container {} completed ".format(container))

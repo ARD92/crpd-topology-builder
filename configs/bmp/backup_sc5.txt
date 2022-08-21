@@ -1,0 +1,25 @@
+set version "20220521.010553__cd-builder.r1259986 [_cd-builder]"
+set interfaces lo unit 0 family inet address 15.15.15.1/32
+set interfaces lo unit 0 family inet address 15.15.15.2/32
+set policy-options policy-statement ADVERTISE_TRUST term 10 from route-filter 15.15.15.1/32 exact
+set policy-options policy-statement ADVERTISE_TRUST term 10 then community add COMM_TRUST
+set policy-options policy-statement ADVERTISE_TRUST term 10 then accept
+set policy-options policy-statement ADVERTISE_UNTRUST term 10 from route-filter 15.15.15.2/32 exact
+set policy-options policy-statement ADVERTISE_UNTRUST term 10 then community add COMM_UNTRUST
+set policy-options policy-statement ADVERTISE_UNTRUST term 10 then accept
+set policy-options community COMM_TRUST members 13979:100
+set policy-options community COMM_UNTRUST members 13979:200
+set protocols bgp group SPE3_Trust type external
+set protocols bgp group SPE3_Trust local-address 192.168.3.2
+set protocols bgp group SPE3_Trust family inet unicast
+set protocols bgp group SPE3_Trust export ADVERTISE_TRUST
+set protocols bgp group SPE3_Trust peer-as 65002
+set protocols bgp group SPE3_Trust local-as 65300
+set protocols bgp group SPE3_Trust neighbor 192.168.3.1
+set protocols bgp group SPE3_Untrust type external
+set protocols bgp group SPE3_Untrust local-address 192.168.3.6
+set protocols bgp group SPE3_Untrust family inet unicast
+set protocols bgp group SPE3_Untrust export ADVERTISE_UNTRUST
+set protocols bgp group SPE3_Untrust peer-as 65002
+set protocols bgp group SPE3_Untrust local-as 65301
+set protocols bgp group SPE3_Untrust neighbor 192.168.3.5

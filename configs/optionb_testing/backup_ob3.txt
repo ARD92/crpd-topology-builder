@@ -1,0 +1,40 @@
+set version "20220501.164742__cd-builder.r1255973 [_cd-builder]"
+set interfaces lo unit 0 family inet address 3.3.3.3/32
+set policy-options policy-statement LEAK_POLICY term 10 from route-filter 192.168.2.0/30 exact
+set policy-options policy-statement LEAK_POLICY term 10 then accept
+set policy-options policy-statement LEAK_POLICY term 20 then reject
+set policy-options policy-statement NH_SELF then next-hop self
+set routing-options interface-routes rib-group inet LEAK
+set routing-options router-id 3.3.3.3
+set routing-options autonomous-system 65001
+set routing-options rib-groups LEAK import-rib inet.0
+set routing-options rib-groups LEAK import-rib inet.3
+set routing-options rib-groups LEAK import-policy LEAK_POLICY
+set protocols bgp group AS65001 type external
+set protocols bgp group AS65001 description "option b ebgp"
+set protocols bgp group AS65001 local-address 192.168.2.1
+set protocols bgp group AS65001 family inet-vpn unicast
+set protocols bgp group AS65001 peer-as 65001
+set protocols bgp group AS65001 local-as 65002
+set protocols bgp group AS65001 neighbor 192.168.2.2
+deactivate protocols bgp group AS65001
+set protocols bgp group OB4 type internal
+set protocols bgp group OB4 family inet-vpn unicast
+set protocols bgp group OB4 export NH_SELF
+set protocols bgp group OB4 neighbor 4.4.4.4 local-address 3.3.3.3
+set protocols bgp group OB2 type internal
+set protocols bgp group OB2 description "option b ibgp"
+set protocols bgp group OB2 local-address 192.168.2.1
+set protocols bgp group OB2 family inet-vpn unicast
+set protocols bgp group OB2 export NH_SELF
+set protocols bgp group OB2 cluster 3.3.3.3
+set protocols bgp group OB2 neighbor 2.2.2.2
+set protocols bgp group OB2 neighbor 192.168.2.2
+set protocols ldp interface ob3_ob4
+set protocols mpls interface all
+set protocols ospf area 0.0.0.200 interface ob3_ob4
+set protocols ospf area 0.0.0.200 interface lo.0 passive
+set protocols ospf area 0.0.0.0 interface ob3_ob2
+deactivate protocols ospf area 0.0.0.0
+set protocols ospf rib-groups inet LEAK
+deactivate protocols ospf rib-groups

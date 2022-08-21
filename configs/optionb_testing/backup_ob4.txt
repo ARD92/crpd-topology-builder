@@ -1,0 +1,26 @@
+set version "20220501.164742__cd-builder.r1255973 [_cd-builder]"
+set interfaces lo unit 0 family inet address 4.4.4.4/32
+set routing-instances VPN1 instance-type vrf
+set routing-instances VPN1 interface ob4pkt1
+set routing-instances VPN1 route-distinguisher 100:101
+set routing-instances VPN1 vrf-target target:100:100
+set routing-instances VPN1 vrf-table-label
+set routing-instances VPN2 instance-type vrf
+set routing-instances VPN2 interface ob4pkt2
+set routing-instances VPN2 route-distinguisher 200:101
+set routing-instances VPN2 vrf-target target:200:100
+set routing-instances VPN2 vrf-table-label
+set routing-instances VPN3 instance-type vrf
+set routing-instances VPN3 interface ob4pkt3
+set routing-instances VPN3 route-distinguisher 300:101
+set routing-instances VPN3 vrf-target target:300:100
+set routing-instances VPN3 vrf-table-label
+set routing-options router-id 4.4.4.4
+set routing-options autonomous-system 65001
+set protocols bgp group OB3 type internal
+set protocols bgp group OB3 family inet-vpn unicast
+set protocols bgp group OB3 neighbor 3.3.3.3 local-address 4.4.4.4
+set protocols ldp interface ob4_ob3
+set protocols mpls interface all
+set protocols ospf area 0.0.0.200 interface ob4_ob3
+set protocols ospf area 0.0.0.200 interface lo.0 passive

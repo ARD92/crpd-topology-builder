@@ -1,0 +1,25 @@
+set version "20220521.010553__cd-builder.r1259986 [_cd-builder]"
+set interfaces lo unit 0 family inet address 12.12.12.1/32
+set interfaces lo unit 0 family inet address 12.12.12.2/32
+set policy-options policy-statement ADVERTISE_TRUST term 10 from route-filter 12.12.12.1/32 exact
+set policy-options policy-statement ADVERTISE_TRUST term 10 then community add COMM_TRUST
+set policy-options policy-statement ADVERTISE_TRUST term 10 then accept
+set policy-options policy-statement ADVERTISE_UNTRUST term 10 from route-filter 12.12.12.2/32 exact
+set policy-options policy-statement ADVERTISE_UNTRUST term 10 then community add COMM_UNTRUST
+set policy-options policy-statement ADVERTISE_UNTRUST term 10 then accept
+set policy-options community COMM_TRUST members 13979:100
+set policy-options community COMM_UNTRUST members 13979:200
+set protocols bgp group SPE1_T type external
+set protocols bgp group SPE1_T local-address 192.168.1.10
+set protocols bgp group SPE1_T family inet unicast
+set protocols bgp group SPE1_T export ADVERTISE_TRUST
+set protocols bgp group SPE1_T peer-as 65000
+set protocols bgp group SPE1_T local-as 65110
+set protocols bgp group SPE1_T neighbor 192.168.1.9
+set protocols bgp group SPE_UT type external
+set protocols bgp group SPE_UT local-address 192.168.1.14
+set protocols bgp group SPE_UT family inet unicast
+set protocols bgp group SPE_UT export ADVERTISE_UNTRUST
+set protocols bgp group SPE_UT peer-as 65000
+set protocols bgp group SPE_UT local-as 65111
+set protocols bgp group SPE_UT neighbor 192.168.1.13

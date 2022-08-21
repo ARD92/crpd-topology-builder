@@ -1,0 +1,33 @@
+set version "20220521.010553__cd-builder.r1259986 [_cd-builder]"
+set system host-name nj01emd
+set interfaces lo unit 0 family inet address 1.1.1.1/32
+set routing-options bmp station sc-discovery connection-mode active
+set routing-options bmp station sc-discovery monitor enable
+set routing-options bmp station sc-discovery station-address 10.85.47.166
+set routing-options bmp station sc-discovery station-port 31002
+set routing-options bmp station sc-discovery traceoptions file bmp.log
+set routing-options bmp station sc-discovery traceoptions flag all
+set protocols bgp group SC1 type external
+set protocols bgp group SC1 local-address 192.168.1.1
+set protocols bgp group SC1 family inet unicast
+set protocols bgp group SC1 peer-as 65100
+set protocols bgp group SC1 local-as 65000
+set protocols bgp group SC1 neighbor 192.168.1.2
+set protocols bgp group SC1_UT type external
+set protocols bgp group SC1_UT local-address 192.168.1.5
+set protocols bgp group SC1_UT family inet unicast
+set protocols bgp group SC1_UT peer-as 65101
+set protocols bgp group SC1_UT local-as 65000
+set protocols bgp group SC1_UT neighbor 192.168.1.6
+set protocols bgp group SC2_T type external
+set protocols bgp group SC2_T local-address 192.168.1.9
+set protocols bgp group SC2_T family inet unicast
+set protocols bgp group SC2_T peer-as 65110
+set protocols bgp group SC2_T local-as 65000
+set protocols bgp group SC2_T neighbor 192.168.1.10
+set protocols bgp group SC2_UT type external
+set protocols bgp group SC2_UT local-address 192.168.1.13
+set protocols bgp group SC2_UT family inet unicast
+set protocols bgp group SC2_UT peer-as 65111
+set protocols bgp group SC2_UT local-as 65000
+set protocols bgp group SC2_UT neighbor 192.168.1.14

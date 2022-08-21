@@ -1,0 +1,27 @@
+set version "20220501.164742__cd-builder.r1255973 [_cd-builder]"
+set interfaces lo unit 0 family inet address 2.2.2.2/32
+set policy-options policy-statement LEAK_POLICY term 10 from route-filter 192.168.2.0/30 exact
+set policy-options policy-statement LEAK_POLICY term 10 then accept
+set policy-options policy-statement LEAK_POLICY term 20 then reject
+set policy-options policy-statement NH_SELF then next-hop self
+set routing-options interface-routes rib-group inet LEAK
+set routing-options router-id 2.2.2.2
+set routing-options autonomous-system 65001
+set routing-options rib-groups LEAK import-rib inet.0
+set routing-options rib-groups LEAK import-rib inet.3
+set routing-options rib-groups LEAK import-policy LEAK_POLICY
+set protocols bgp group OB1 type internal
+set protocols bgp group OB1 family inet-vpn unicast
+set protocols bgp group OB1 export NH_SELF
+set protocols bgp group OB1 neighbor 1.1.1.1 local-address 2.2.2.2
+set protocols bgp group OB3 type internal
+set protocols bgp group OB3 local-address 192.168.2.2
+set protocols bgp group OB3 family inet-vpn unicast
+set protocols bgp group OB3 export NH_SELF
+set protocols bgp group OB3 cluster 2.2.2.2
+set protocols bgp group OB3 neighbor 192.168.2.1
+set protocols ldp interface ob2_ob1
+set protocols mpls interface all
+set protocols ospf area 0.0.0.100 interface ob2_ob1
+set protocols ospf area 0.0.0.100 interface lo.0 passive
+set protocols ospf rib-groups inet LEAK
