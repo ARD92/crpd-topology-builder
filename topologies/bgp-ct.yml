@@ -1,0 +1,256 @@
+# RR1 and RR2 are service/transport RR
+# CE1, CE2, CE11 and CE12 are CE routers which need specific SLA requirements
+---
+nodes:
+  - name: ce1
+    image: crpd:latest
+    link:
+      - name: pe1
+        prefix: 192.168.1.1/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: ce2
+    image: crpd:latest
+    link:
+      - name: pe1
+        prefix: 192.168.2.1/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: pe1
+    image: crpd:latest
+    link:
+      - name: ce1
+        prefix: 192.168.1.2/30
+      - name: ce2
+        prefix: 192.168.2.2/30
+      - name: p1
+        prefix: 10.0.0.1/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: p1
+    image: crpd:latest
+    link:
+      - name: pe1
+        prefix: 10.0.0.2/30
+      - name: abr1
+        prefix: 10.0.0.5/30
+      - name: abr2
+        prefix: 10.0.0.9/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: abr1
+    image: crpd:latest
+    link:
+      - name: p1
+        prefix: 10.0.0.6/30
+      - name: abr2
+        prefix: 10.0.0.13/30
+      - name: asbr12
+        prefix: 10.0.0.17/30
+      - name: p2
+        prefix: 10.0.0.21/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: abr2
+    image: crpd:latest
+    link:
+      - name: p1
+        prefix: 10.0.0.10/30
+      - name: abr1
+        prefix: 10.0.0.14/30
+      - name: asbr23
+        prefix: 10.0.0.41/30
+      - name: p2
+        prefix: 10.0.0.25/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: p2
+    image: crpd:latest
+    link:
+      - name: abr1
+        prefix: 10.0.0.22/30
+      - name: abr2
+        prefix: 10.0.0.26/30
+      - name: asbr12
+        prefix: 10.0.0.29/30
+      - name: asbr23
+        prefix: 10.0.0.33/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: asbr12
+    image: crpd:latest
+    link:
+      - name: abr1
+        prefix: 10.0.0.18/30
+      - name: p2
+        prefix: 10.0.0.30/30
+      - name: asbr23
+        prefix: 10.0.0.37/30
+      - name: asbr21
+        prefix: 10.0.1.1/30
+      - name: asbr32
+        prefix: 10.0.1.5/30
+      - name: rr1
+        prefix: 10.2.0.2/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: asbr23
+    image: crpd:latest
+    link:
+      - name: abr2
+        prefix: 10.0.0.42/30
+      - name: p2
+        prefix: 10.0.0.34/30
+      - name: asbr12
+        prefix: 10.0.0.38/30
+      - name: asbr21
+        prefix: 10.0.1.9/30
+      - name: asbr32
+        prefix: 10.0.1.13/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: asbr21
+    image: crpd:latest
+    link:
+      - name: asbr12
+        prefix: 10.0.1.2/30
+      - name: asbr23
+        prefix: 10.0.1.10/30
+      - name: p3
+        prefix: 10.0.1.21/30
+      - name: pe11
+        prefix: 10.0.1.17/30
+      - name: rr2
+        prefix: 10.3.0.2/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: asbr32
+    image: crpd:latest
+    link:
+      - name: asbr23
+        prefix: 10.0.1.14/30
+      - name: asbr12
+        prefix: 10.0.1.6/30
+      - name: p3
+        prefix: 10.0.1.25/30
+      - name: pe31
+        prefix: 10.0.1.17/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: p3
+    image: crpd:latest
+    link:
+      - name: asbr21
+        prefix: 10.0.1.22/30
+      - name: asbr32
+        prefix: 10.0.1.26/30
+      - name: pe11
+        prefix: 10.0.1.29/30
+      - name: pe31
+        prefix: 10.0.1.33/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: pe11
+    image: crpd:latest
+    link:
+      - name: asbr21
+        prefix: 10.0.1.18/30
+      - name: p3
+        prefix: 10.0.1.30/30
+      - name: ce11
+        prefix: 192.168.3.2/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: pe31
+    image: crpd:latest
+    link:
+      - name: asbr32
+        prefix: 10.0.1.38/30
+      - name: p3
+        prefix: 10.0.1.34/30
+      - name: ce12
+        prefix: 192.168.4.2/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: ce11
+    image: crpd:latest
+    link:
+      - name: pe11
+        prefix: 192.168.3.1/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: ce12
+    image: crpd:latest
+    link:
+      - name: pe31
+        prefix: 192.168.4.1/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: rr1
+    image: crpd:latest
+    link:
+      - name: asbr12
+        prefix: 10.2.0.1/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: rr2
+    image: crpd:latest
+    link:
+      - name: asbr21
+        prefix: 10.3.0.1/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
