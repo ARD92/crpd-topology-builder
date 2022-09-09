@@ -164,7 +164,7 @@ nodes:
       - name: p3
         prefix: 10.0.1.25/30
       - name: pe31
-        prefix: 10.0.1.17/30
+        prefix: 10.0.1.37/30
     volume:
         - name: config
           path: /config
