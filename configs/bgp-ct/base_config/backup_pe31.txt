@@ -1,0 +1,12 @@
+set version "20220815.220609__cd-builder.r1278498 [_cd-builder]"
+set interfaces lo unit 0 family inet address 2.2.2.5/32
+set routing-options router-id 2.2.2.5
+set routing-options autonomous-system 65501
+set protocols bgp group RR2 type internal
+set protocols bgp group RR2 local-address 2.2.2.5
+set protocols bgp group RR2 neighbor 2.11.11.11 family inet labeled-unicast
+set protocols bgp group RR2 neighbor 2.11.11.11 family inet transport
+set protocols bgp group RR2 neighbor 2.11.11.11 family inet-vpn unicast
+set protocols ospf area 0.0.0.100 interface lo.0 passive
+set protocols ospf area 0.0.0.100 interface pe31_asbr32
+set protocols ospf area 0.0.0.100 interface pe31_p3

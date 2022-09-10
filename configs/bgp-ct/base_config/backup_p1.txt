@@ -1,0 +1,7 @@
+set version "20220815.220609__cd-builder.r1278498 [_cd-builder]"
+set interfaces lo unit 0 family inet address 1.1.1.2/32
+set routing-options router-id 1.1.1.2
+set protocols ospf area 0.0.0.100 interface p1_pe1
+set protocols ospf area 0.0.0.100 interface p1_abr1
+set protocols ospf area 0.0.0.100 interface p1_abr2
+set protocols ospf area 0.0.0.100 interface lo.0 passive

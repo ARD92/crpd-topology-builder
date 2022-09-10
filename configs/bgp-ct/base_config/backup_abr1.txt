@@ -1,0 +1,14 @@
+set version "20220815.220609__cd-builder.r1278498 [_cd-builder]"
+set interfaces lo unit 0 family inet address 1.1.1.3/32
+set routing-options router-id 1.1.1.3
+set routing-options autonomous-system 65500
+set protocols bgp group RR1 type internal
+set protocols bgp group RR1 local-address 1.1.1.3
+set protocols bgp group RR1 neighbor 1.11.11.11 family inet labeled-unicast
+set protocols bgp group RR1 neighbor 1.11.11.11 family inet transport
+set protocols mpls interface all
+set protocols ospf area 0.0.0.100 interface abr1_p1
+set protocols ospf area 0.0.0.100 interface abr1_abr2
+set protocols ospf area 0.0.0.100 interface lo.0 passive
+set protocols ospf area 0.0.0.0 interface abr1_asbr12
+set protocols ospf area 0.0.0.0 interface abr1_p2
