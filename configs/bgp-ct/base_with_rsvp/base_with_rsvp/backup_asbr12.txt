@@ -1,0 +1,32 @@
+set version "20220920.015052__cd-builder.r1285319 [_cd-builder]"
+set interfaces lo unit 0 family inet address 1.1.1.6/32
+set routing-options route-distinguisher-id 1.1.1.6
+set routing-options router-id 1.1.1.6
+set routing-options autonomous-system 65500
+set routing-options transport-class name slice-1 color 100
+set routing-options transport-class name slice-1 tunnel-egress end-point 1.1.1.6
+set routing-options transport-class name slice-2 color 200
+set routing-options transport-class name slice-2 tunnel-egress end-point 1.1.1.6
+set protocols bgp group RR1 type internal
+set protocols bgp group RR1 local-address 1.1.1.6
+set protocols bgp group RR1 neighbor 1.11.11.11 family inet labeled-unicast
+set protocols bgp group RR1 neighbor 1.11.11.11 family inet transport
+set protocols bgp group AS65501 type external
+set protocols bgp group AS65501 family inet labeled-unicast rib inet.3
+set protocols bgp group AS65501 family inet transport
+set protocols bgp group AS65501 peer-as 65501
+set protocols bgp group AS65501 neighbor 10.0.1.6
+set protocols bgp group AS65501 neighbor 10.0.1.2
+set protocols mpls interface all
+set protocols mpls interface eth0 disable
+set protocols ospf traffic-engineering
+set protocols ospf area 0.0.0.0 interface lo.0 passive
+set protocols ospf area 0.0.0.0 interface asbr12_p2
+set protocols ospf area 0.0.0.0 interface asbr12_asbr23
+set protocols ospf area 0.0.0.0 interface asbr12_rr1
+set protocols rsvp traceoptions file rsvp
+set protocols rsvp traceoptions file size 100m
+set protocols rsvp traceoptions flag all
+set protocols rsvp interface lo.0
+set protocols rsvp interface asbr12_p2
+set protocols rsvp interface asbr12_rr1

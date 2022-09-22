@@ -1,0 +1,22 @@
+set version "20220920.015052__cd-builder.r1285319 [_cd-builder]"
+set interfaces lo unit 0 family inet address 2.2.2.4/32
+set routing-instances VPN-RED instance-type vrf
+set routing-instances VPN-RED interface pe11_ce11
+set routing-instances VPN-RED route-distinguisher 100:201
+set routing-instances VPN-RED vrf-target target:100:200
+set routing-instances VPN-RED vrf-table-label
+set routing-options router-id 2.2.2.4
+set routing-options autonomous-system 65501
+set protocols bgp group RR2 type internal
+set protocols bgp group RR2 local-address 2.2.2.4
+set protocols bgp group RR2 neighbor 2.11.11.11 family inet labeled-unicast
+set protocols bgp group RR2 neighbor 2.11.11.11 family inet transport
+set protocols bgp group RR2 neighbor 2.11.11.11 family inet-vpn unicast
+set protocols mpls interface all
+set protocols mpls interface eth0 disable
+set protocols ospf area 0.0.0.100 interface pe11_asbr21
+set protocols ospf area 0.0.0.100 interface pe11_p3
+set protocols ospf area 0.0.0.100 interface lo.0 passive
+set protocols rsvp interface lo.0
+set protocols rsvp interface pe11_asbr21
+set protocols rsvp interface pe11_p3

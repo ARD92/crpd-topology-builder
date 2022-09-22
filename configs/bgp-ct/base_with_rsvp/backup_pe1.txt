@@ -1,0 +1,21 @@
+set version "20220920.015052__cd-builder.r1285319 [_cd-builder]"
+set interfaces lo unit 0 family inet address 1.1.1.1/32
+set routing-options route-distinguisher-id 1.1.1.1
+set routing-options resolution preserve-nexthop-hierarchy
+set routing-options router-id 1.1.1.1
+set routing-options autonomous-system 65500
+set routing-options transport-class name slice-1 color 100
+set routing-options transport-class name slice-1 tunnel-egress end-point 1.1.1.1
+set routing-options transport-class name slice-2 color 200
+set routing-options transport-class name slice-2 tunnel-egress end-point 1.1.1.1
+set protocols bgp group RR1 type internal
+set protocols bgp group RR1 local-address 1.1.1.1
+set protocols bgp group RR1 neighbor 1.11.11.11 family inet labeled-unicast
+set protocols bgp group RR1 neighbor 1.11.11.11 family inet transport
+set protocols bgp group RR1 neighbor 1.11.11.11 family inet-vpn unicast
+set protocols mpls interface all
+set protocols mpls interface eth0 disable
+set protocols ospf area 0.0.0.100 interface pe1_p1
+set protocols ospf area 0.0.0.100 interface lo.0 passive
+set protocols rsvp interface pe1_p1
+set protocols rsvp interface lo.0
