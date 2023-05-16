@@ -1,0 +1,12 @@
+set version "20221017.175119__cd-builder.r1291299 [_cd-builder]"
+set system root-authentication encrypted-password "$6$aWdj8$WnRgFqbN/99EodXvNEF2P9VlgczRTQHwMMfQvvgI7TWDMLkZy2GbY8HowhsGMCJNSAiQYRF2tOpQO12nPp5pS."
+set interfaces lo unit 0 family inet address 1.1.1.1/32
+set routing-options autonomous-system 65531
+set protocols bgp group TO_R2 type external
+set protocols bgp group TO_R2 family inet unicast
+set protocols bgp group TO_R2 peer-as 65532
+set protocols bgp group TO_R2 neighbor 192.168.1.2 local-address 192.168.1.1
+set protocols bgp group TO_R3 type external
+set protocols bgp group TO_R3 family inet unicast
+set protocols bgp group TO_R3 peer-as 65533
+set protocols bgp group TO_R3 neighbor 192.168.2.2 local-address 192.168.2.1

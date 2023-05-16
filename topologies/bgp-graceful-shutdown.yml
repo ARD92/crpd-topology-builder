@@ -1,0 +1,50 @@
+nodes:
+  - name: r1
+    image: crpd:latest
+    link:
+      - name: r2
+        prefix: 192.168.1.1/30
+      - name: r3
+        prefix: 192.168.2.1/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: r2
+    image: crpd:latest
+    link:
+      - name: r1
+        prefix: 192.168.1.2/30
+      - name: r4
+        prefix: 192.168.3.2/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: r3
+    image: crpd:latest
+    link:
+      - name: r1
+        prefix: 192.168.2.2/30
+      - name: r4
+        prefix: 192.168.4.2/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: r4
+    image: crpd:latest
+    link:
+      - name: r2
+        prefix: 192.168.3.1/30
+      - name: r3
+        prefix: 192.168.4.1/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+

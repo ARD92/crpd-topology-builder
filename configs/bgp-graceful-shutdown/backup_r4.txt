@@ -1,0 +1,18 @@
+set version "20221017.175119__cd-builder.r1291299 [_cd-builder]"
+set interfaces lo unit 0 family inet address 4.4.4.4/32
+set policy-options policy-statement ADVERTISE_LO term 10 from route-filter 4.4.4.4/32 exact
+set policy-options policy-statement ADVERTISE_LO term 10 then accept
+set policy-options policy-statement ADVERTISE_LO term 20 then reject
+set routing-options autonomous-system 65534
+set protocols bgp group TO_R2 type external
+set protocols bgp group TO_R2 family inet unicast
+set protocols bgp group TO_R2 export ADVERTISE_LO
+set protocols bgp group TO_R2 peer-as 65532
+set protocols bgp group TO_R2 graceful-shutdown sender local-preference 10
+set protocols bgp group TO_R2 shutdown notify-message "maintenance in progress"
+set protocols bgp group TO_R2 neighbor 192.168.3.2 local-address 192.168.3.1
+set protocols bgp group TO_R3 type external
+set protocols bgp group TO_R3 family inet unicast
+set protocols bgp group TO_R3 export ADVERTISE_LO
+set protocols bgp group TO_R3 peer-as 65533
+set protocols bgp group TO_R3 neighbor 192.168.4.2 local-address 192.168.4.1

@@ -1,0 +1,11 @@
+set version "20221017.175119__cd-builder.r1291299 [_cd-builder]"
+set interfaces lo unit 0 family inet address 3.3.3.3/32
+set routing-options autonomous-system 65533
+set protocols bgp group TO_R1 type external
+set protocols bgp group TO_R1 family inet unicast
+set protocols bgp group TO_R1 peer-as 65531
+set protocols bgp group TO_R1 neighbor 192.168.2.1 local-address 192.168.2.2
+set protocols bgp group TO_R4 type external
+set protocols bgp group TO_R4 family inet unicast
+set protocols bgp group TO_R4 peer-as 65534
+set protocols bgp group TO_R4 neighbor 192.168.4.1 local-address 192.168.4.2
