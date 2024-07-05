@@ -1,0 +1,98 @@
+#                                            <- 1.1.1.1                            
+#                                                                                  
+#                                           ┌─────────┐                            
+#                                           │         │                            
+#                         ┌────ibgp─────────┤   PE2   ├───────ebgp──────┐          
+#             1.1.1.1:PE1 │                 └─────────┘                 │          
+#             1.1.1.1:PE2 │                                             │          
+#                         │                                         ┌───┴──────┐   
+# ┌───────┐          ┌────┴───┐                                     │          │   
+# │       ├───ibgp───┤  RR 1  │                                     │   CE     │   
+# │  PE1  │          │        │                                     │          │   
+# └───────┘          └──┬─┬───┘                                     └───┬──────┘   
+#                       │ │                                             │   1.1.1.1
+#                       │ │                                             │          
+#                       │ │                  ┌──────────┐               │          
+#                       │ └───ibgp───────────┤          │               │          
+#                       │                    │   PE3    ├──────ebgp─────┘          
+#                      ibgp                  └──────────┘                          
+#                       listener                                                   
+#                       │                    <- 1.1.1.1                            
+#                     ┌─┴──────────┐                                               
+#                     │   monitor  │                                               
+#                     └────────────┘                                               
+#                                                                                  
+---
+nodes:
+  - name: pe1
+    image: crpd:23.2R1.13
+    link:
+      - name: rr
+        prefix: 192.168.1.1/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: pe2
+    image: crpd:23.2R1.13
+    link:
+      - name: rr
+        prefix: 192.168.2.1/30
+      - name: ce
+        prefix: 192.168.5.1/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: pe3
+    image: crpd:23.2R1.13
+    link:
+      - name: rr
+        prefix: 192.168.3.1/30
+      - name: ce
+        prefix: 192.168.6.1/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: ce
+    image: crpd:23.2R1.13
+    link:
+      - name: pe2
+        prefix: 192.168.5.2/30
+      - name: pe3
+        prefix: 192.168.6.2/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: lrsi
+    image: crpd:23.2R1.13
+    link:
+      - name: rr
+        prefix: 192.168.4.1/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log
+  - name: rr
+    image: crpd:23.2R1.13
+    link:
+      - name: pe1
+        prefix: 192.168.1.2/30
+      - name: pe2
+        prefix: 192.168.2.2/30
+      - name: pe3
+        prefix: 192.168.3.2/30
+      - name: lrsi
+        prefix: 192.168.4.2/30
+    volume:
+        - name: config
+          path: /config
+        - name: varlogq
+          path: /var/log

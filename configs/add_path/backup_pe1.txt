@@ -1,0 +1,9 @@
+set version 20230616.051920_builder.r1345402
+set interfaces lo0 unit 0 family inet address 100.1.1.1/32
+set routing-options router-id 100.1.1.1
+set routing-options autonomous-system 65001
+set protocols bgp group RR type internal
+set protocols bgp group RR family inet unicast
+set protocols bgp group RR neighbor 100.100.100.100 local-address 100.1.1.1
+set protocols ospf area 0.0.0.0 interface lo0.0 passive
+set protocols ospf area 0.0.0.0 interface pe1_rr

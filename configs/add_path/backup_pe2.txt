@@ -1,0 +1,15 @@
+set version 20230616.051920_builder.r1345402
+set interfaces lo0 unit 0 family inet address 100.1.1.2/32
+set policy-options policy-statement NH_SELF term 10 then next-hop self
+set routing-options router-id 100.1.1.2
+set routing-options autonomous-system 65001
+set protocols bgp group RR type internal
+set protocols bgp group RR family inet unicast
+set protocols bgp group RR export NH_SELF
+set protocols bgp group RR neighbor 100.100.100.100 local-address 100.1.1.2
+set protocols bgp group CE type external
+set protocols bgp group CE family inet unicast
+set protocols bgp group CE peer-as 10000
+set protocols bgp group CE neighbor 192.168.5.2
+set protocols ospf area 0.0.0.0 interface lo0.0 passive
+set protocols ospf area 0.0.0.0 interface pe2_rr
